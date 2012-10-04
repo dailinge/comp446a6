@@ -79,4 +79,44 @@
     return [NSURL URLWithString:[self urlStringForPhoto:photo format:format]];
 }
 
++ (NSString *)namePlace:(NSDictionary *)place {
+    NSString *content = [place valueForKeyPath:@"_content"];
+    NSArray *contentSegments = [content componentsSeparatedByString:@","];
+    NSString *cityName = [contentSegments objectAtIndex:0];
+    return cityName;
+}
+
++ (NSString *)descriptionPlace:(NSDictionary *)place
+{
+    NSString *content = [place valueForKeyPath:@"_content"];
+    NSArray *contentSegments = [content componentsSeparatedByString:@","];
+    NSString *stateName = [(NSString *)[contentSegments objectAtIndex:1] substringFromIndex:1];
+    NSString *countryName = [(NSString *)[contentSegments objectAtIndex:2] substringFromIndex:1];
+    return [NSString stringWithFormat:@"%@,%@", stateName, countryName]; 
+}
+
++ (NSString *)namePhoto:(NSDictionary *)photo
+{
+    NSString *title = [photo valueForKeyPath:@"title"];
+    NSString *description = [photo valueForKeyPath:@"description._content"];
+    if ([title isEqualToString:@""]) {
+        if ([description isEqualToString:@""]) {
+            return @"Unknown";
+        } else {
+            return description;
+        }
+    }
+    return title;
+}
+
++ (NSString *)descriptionPhoto:(NSDictionary *)photo
+{
+    NSString *title = [photo valueForKeyPath:@"title"];
+    NSString *description = [photo valueForKeyPath:@"description._content"];
+    if ([title isEqualToString:@""]) {
+        return @"";
+    }
+    return description;
+}
+
 @end

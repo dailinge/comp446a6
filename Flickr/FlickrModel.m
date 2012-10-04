@@ -19,6 +19,14 @@
 @synthesize sectionNames = _sectionNames;
 @synthesize flickrInfo = _flickrInfo;
 
+
+-(void)initFlickrData
+{
+    //NSLog(@"%@", [FlickrFetcher topPlaces]);
+    self.flickrInfo = [FlickrFetcher topPlaces];
+    
+}
+
 - (id)init
 {
     if (self = [super init])
@@ -32,11 +40,13 @@
     return self;
 }
 
-- (NSString *)nameOfSection:(NSInteger)sectionIndex {
+- (NSString *)nameOfSection:(NSInteger)sectionIndex 
+{
     
 }
 
-- (NSString *)nameOfRow:(NSInteger)rowIndex {
+- (NSString *)nameOfRow:(NSInteger)rowIndex 
+{
     
 }
 
@@ -44,15 +54,9 @@
     return [self.flickrInfo count];
 }
 
-- (NSDictionary *)getPlace:(NSInteger)index {
-    return [self.flickrInfo objectAtIndex:index];
-}
-
--(void)initFlickrData
+- (NSDictionary *)getPlace:(NSInteger)index 
 {
-    //NSLog(@"%@", [FlickrFetcher topPlaces]);
-    self.flickrInfo = [FlickrFetcher topPlaces];
-    
+    return [self.flickrInfo objectAtIndex:index];
 }
 
 

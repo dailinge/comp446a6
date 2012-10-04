@@ -9,5 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface DetailFlickrViewController : UITableViewController
+@property (nonatomic, strong) NSDictionary *place;
+@property (nonatomic, strong) NSArray *photoList;
 
 @end
