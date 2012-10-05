@@ -22,17 +22,31 @@
 
 
 - (void)loadImage {
-    NSURL *imageUrl = [FlickrFetcher urlForPhoto:self.photo format:2];
+    NSURL *imageUrl = [FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge];
     NSData *photoData = [NSData dataWithContentsOfURL:imageUrl];
     self.imageView.image = [UIImage imageWithData:photoData];
-    self.imageView.frame = CGRectMake(0, 0, self.imageView.image.size.width, self.imageView.image.size.height);
-    self.scrollView.delegate = self;
-    self.scrollView.contentSize = self.imageView.image.size;
-    self.scrollView.minimumZoomScale = 0.5;
-    self.scrollView.maximumZoomScale = 2;
+    self.imageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.imageView.image.size};
     
-    [self.view setNeedsDisplay];
+    self.scrollView.contentSize = self.imageView.image.size;
+  
+    self.scrollView.delegate = self;
+    
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    CGRect scrollViewFrame = self.scrollView.frame;
+    CGFloat scaleWidth = scrollViewFrame.size.width / self.scrollView.contentSize.width;
+    CGFloat scaleHeight = scrollViewFrame.size.height / self.scrollView.contentSize.height;
+    CGFloat minScale = MIN(scaleWidth, scaleHeight);
+    self.scrollView.minimumZoomScale = minScale;
+    
+    self.scrollView.maximumZoomScale = 1.0f;
+    self.scrollView.zoomScale = minScale;
+}
+
+
 - (void)setPhoto:(NSDictionary *)photo
 {
     if (_photo != photo) {
@@ -42,7 +56,6 @@
     }
         
 }
-
 
 - (void)viewDidLoad
 {
@@ -61,7 +74,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 - (UIView*) viewForZoomingInScrollView:(UIScrollView *)scrollView
@@ -69,11 +82,7 @@
     return self.imageView;
 }
 
--(void)scrollViewDidEndZooming:(UIScrollView *)scrollView
-                      withView:(UIView *)view
-                       atScale:(float)scale
-{
-}
+
 
 
 @end

@@ -40,15 +40,6 @@
     return self;
 }
 
-- (NSString *)nameOfSection:(NSInteger)sectionIndex 
-{
-    
-}
-
-- (NSString *)nameOfRow:(NSInteger)rowIndex 
-{
-    
-}
 
 - (NSInteger)numberOfRow {
     return [self.flickrInfo count];

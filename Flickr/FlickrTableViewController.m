@@ -47,16 +47,23 @@
 
 }
 
+- (void) viewWillAppear:(BOOL)animated
+{
+    self.navigationItem.title = @"Most Viewed";
+    [self.tableView reloadData];
+}
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
+    
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 #pragma mark - Table view data source

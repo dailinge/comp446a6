@@ -65,7 +65,7 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 #pragma mark - Table view data source
@@ -94,6 +94,11 @@
     return cell;
 }
 
+- (void) viewWillAppear:(BOOL)animated
+{
+    [self.tableView reloadData];
+}
+
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -108,11 +113,47 @@
     [self performSegueWithIdentifier:@"PhotoImage" sender:self];
 }
 
+
+- (void)updateFavorite:(NSDictionary *)photo
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *recentPhotos = [[defaults objectForKey:FLICKR_RECENT] mutableCopy];
+    
+    if (recentPhotos == nil)
+    {
+        recentPhotos = [NSMutableArray array];
+    }
+    
+    NSString *photoId = [photo objectForKey:FLICKR_PHOTO_ID];
+    NSMutableArray *newRecents = [NSMutableArray array];
+    
+    for (int index = 0; ((index < 20) && (index < [recentPhotos count])); index++) {
+        NSDictionary *currentPhoto = [recentPhotos objectAtIndex:index];
+        NSString *currentPhotoId = [currentPhoto objectForKey:FLICKR_PHOTO_ID];
+        
+        if (![currentPhotoId isEqualToString:photoId]) {
+            [newRecents insertObject:currentPhoto atIndex:[newRecents count]];
+        }
+        
+    }
+    [newRecents insertObject:photo atIndex:0];
+    if ([newRecents count] > 20) {
+        NSRange range = NSMakeRange(0, 20);
+        newRecents = [NSMutableArray arrayWithArray:[newRecents subarrayWithRange:range]];
+    }
+    
+    [defaults setObject:[newRecents copy] forKey:FLICKR_RECENT];
+    
+    
+    
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     if ([segue.identifier isEqualToString:@"PhotoImage"]) {
         NSIndexPath *cellPath = [self.tableView indexPathForSelectedRow];
         NSDictionary *photo = [self.photoList objectAtIndex:cellPath.row];
+        [self updateFavorite:photo];
         [segue.destinationViewController setPhoto:photo];
     }
 }

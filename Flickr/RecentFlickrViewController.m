@@ -7,6 +7,8 @@
 //
 
 #import "RecentFlickrViewController.h"
+#import "FlickrFetcher.h"
+#import "PhotoFlickrViewController.h"
 
 @interface RecentFlickrViewController ()
 
@@ -34,6 +36,12 @@
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
 }
 
+- (void) viewWillAppear:(BOOL)animated
+{
+    self.navigationItem.title = @"Recents";
+    [self.tableView reloadData];
+}
+
 - (void)viewDidUnload
 {
     [super viewDidUnload];
@@ -43,23 +51,28 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    return YES;
 }
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+- (NSArray *)getRecents
 {
-#warning Potentially incomplete method implementation.
-    // Return the number of sections.
-    return 0;
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSArray *recentPhotos = [defaults objectForKey:FLICKR_RECENT];
+    
+    if (recentPhotos == nil) {
+        recentPhotos = [NSArray array];
+    }
+    return recentPhotos;
 }
+
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-#warning Incomplete method implementation.
+
     // Return the number of rows in the section.
-    return 0;
+    return [[self getRecents] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -68,48 +81,18 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     // Configure the cell...
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+    }
+    NSDictionary *photo = [[self getRecents] objectAtIndex:indexPath.row];
+    cell.textLabel.text = [FlickrFetcher namePhoto:photo];
+    
+    cell.detailTextLabel.text = [FlickrFetcher descriptionPhoto:photo];   
     
     return cell;
+    
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
 
 #pragma mark - Table view delegate
 
@@ -122,6 +105,51 @@
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
+    [self performSegueWithIdentifier:@"RecentPhoto" sender:self];
+}
+
+- (void)updateFavorite:(NSDictionary *)photo
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *recentPhotos = [[defaults objectForKey:FLICKR_RECENT] mutableCopy];
+    
+    if (recentPhotos == nil)
+    {
+        recentPhotos = [NSMutableArray array];
+    }
+    
+    NSString *photoId = [photo objectForKey:FLICKR_PHOTO_ID];
+    NSMutableArray *newRecents = [NSMutableArray array];
+    
+    for (int index = 0; ((index < 20) && (index < [recentPhotos count])); index++) {
+        NSDictionary *currentPhoto = [recentPhotos objectAtIndex:index];
+        NSString *currentPhotoId = [currentPhoto objectForKey:FLICKR_PHOTO_ID];
+        
+        if (![currentPhotoId isEqualToString:photoId]) {
+            [newRecents insertObject:currentPhoto atIndex:[newRecents count]];
+        }
+        
+    }
+    [newRecents insertObject:photo atIndex:0];
+    if ([newRecents count] > 20) {
+        NSRange range = NSMakeRange(0, 20);
+        newRecents = [NSMutableArray arrayWithArray:[newRecents subarrayWithRange:range]];
+    }
+    
+    [defaults setObject:[newRecents copy] forKey:FLICKR_RECENT];
+    
+    
+    
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    if ([segue.identifier isEqualToString:@"RecentPhoto"]) {
+        NSIndexPath *cellPath = [self.tableView indexPathForSelectedRow];
+        NSDictionary *photo = [[self getRecents] objectAtIndex:cellPath.row];
+        [self updateFavorite:photo];
+        [segue.destinationViewController setPhoto:photo];
+    }
 }
 
 @end

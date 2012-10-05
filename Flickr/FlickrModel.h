@@ -10,7 +10,6 @@
 
 @interface FlickrModel : NSObject
 
-- (NSString *)nameOfSection:(NSInteger)sectionIndex;
 - (NSInteger)numberOfRow;
 - (NSDictionary *)getPlace:(NSInteger)index;
 
