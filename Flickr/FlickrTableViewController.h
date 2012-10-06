@@ -2,7 +2,7 @@
 //  FlickrTableViewController.h
 //  Flickr
 //
-//  Created by Heaven  Chen on 10/2/12.
+//  Created by Linge Dai on 10/2/12.
 //  Copyright (c) 2012 Rice. All rights reserved.
 //
 
