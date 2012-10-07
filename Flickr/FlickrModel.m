@@ -13,18 +13,42 @@
 
 @property (nonatomic, strong) NSArray *sectionNames;
 @property (nonatomic, strong) NSArray *flickrInfo;
+@property (nonatomic, strong) NSDictionary *countryDict;
 
 @end
 @implementation FlickrModel
 @synthesize sectionNames = _sectionNames;
 @synthesize flickrInfo = _flickrInfo;
+@synthesize countryDict = _countryDict;
 
 
--(void)initFlickrData
+- (void)initFlickrData
 {
     //NSLog(@"%@", [FlickrFetcher topPlaces]);
     self.flickrInfo = [FlickrFetcher topPlaces];
+    [self initCountryDict];
+}
+
+- (void)initCountryDict
+{
+    NSArray *places = self.flickrInfo;
+    NSDictionary *newCountryDict = [[NSMutableDictionary alloc] init];
     
+    for (int i = 0; i < [places count]; i++) {
+        NSDictionary *curPlace = [places objectAtIndex:i];
+        NSString *curCountryName = [FlickrFetcher countryNamePlace:curPlace];
+        
+        NSMutableArray *countryCities = [[newCountryDict objectForKey:curCountryName] mutableCopy];
+        if (countryCities == nil) {
+            countryCities = [[NSMutableArray alloc] init];
+        }
+        [countryCities insertObject:curPlace atIndex:[countryCities count]];
+        [newCountryDict setValue:[countryCities copy] forKey:curCountryName];
+    }
+    
+    self.sectionNames = [newCountryDict allKeys];
+    self.sectionNames = [self.sectionNames sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    self.countryDict = newCountryDict;
 }
 
 - (id)init
@@ -41,13 +65,22 @@
 }
 
 
-- (NSInteger)numberOfRow {
-    return [self.flickrInfo count];
+- (NSInteger)numberOfRow:(NSInteger)section {
+    return [[self.countryDict objectForKey:[self.sectionNames objectAtIndex:section]] count];
 }
 
-- (NSDictionary *)getPlace:(NSInteger)index 
+- (NSInteger)numberOfSection {
+    return [self.sectionNames count];
+}
+
+- (NSDictionary *)getPlace:(NSInteger)index sectionNumber:(NSInteger)sectionIndex
 {
-    return [self.flickrInfo objectAtIndex:index];
+    return [[self.countryDict objectForKey:[self.sectionNames objectAtIndex:sectionIndex]] objectAtIndex:index];
+}
+
+- (NSString *)getSectionName:(NSInteger)index 
+{
+    return [self.sectionNames objectAtIndex:index];
 }
 
 

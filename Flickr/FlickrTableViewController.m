@@ -68,17 +68,22 @@
 
 #pragma mark - Table view data source
 
-/*- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     
     // Return the number of sections.
-    return ;
-}*/
+    return [self.flickrModel numberOfSection];
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return [self.flickrModel numberOfRow];
+    return [self.flickrModel numberOfRow:section];
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return [self.flickrModel getSectionName:section];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -91,7 +96,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
     
-    NSDictionary *place = [self.flickrModel getPlace:indexPath.row];
+    NSDictionary *place = [self.flickrModel getPlace:indexPath.row sectionNumber:indexPath.section];
     cell.textLabel.text = [FlickrFetcher namePlace:place];
     cell.detailTextLabel.text = [FlickrFetcher descriptionPlace:place];
     return cell;
@@ -116,7 +121,7 @@
 {
     if ([segue.identifier isEqualToString:@"PhotoDetail"]) {
         NSIndexPath *cellPath = [self.tableView indexPathForSelectedRow];
-        NSDictionary *place = [self.flickrModel getPlace:cellPath.row];
+        NSDictionary *place = [self.flickrModel getPlace:cellPath.row sectionNumber:cellPath.section];
         [segue.destinationViewController setPlace:place];
         [segue.destinationViewController setPhotoList:[FlickrFetcher photosInPlace:place maxResults:50]];
     }

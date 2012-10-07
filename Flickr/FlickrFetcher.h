@@ -29,7 +29,9 @@ typedef enum {
 + (NSURL *)urlForPhoto:(NSDictionary *)photo format:(FlickrPhotoFormat)format;
 + (NSString *)namePlace:(NSDictionary *)place;
 + (NSString *)descriptionPlace:(NSDictionary *)place;
++ (NSString *)countryNamePlace:(NSDictionary *)place;
 + (NSString *)namePhoto:(NSDictionary *)photo;
 + (NSString *)descriptionPhoto:(NSDictionary *)photo;
+
 
 @end

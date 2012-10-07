@@ -90,9 +90,39 @@
 {
     NSString *content = [place valueForKeyPath:@"_content"];
     NSArray *contentSegments = [content componentsSeparatedByString:@","];
-    NSString *stateName = [(NSString *)[contentSegments objectAtIndex:1] substringFromIndex:1];
-    NSString *countryName = [(NSString *)[contentSegments objectAtIndex:2] substringFromIndex:1];
-    return [NSString stringWithFormat:@"%@,%@", stateName, countryName]; 
+    NSInteger numSegments = [contentSegments count];
+    if (numSegments == 0) {
+        return @"";
+    } else if (numSegments == 1) {
+        return content;
+    } else if (numSegments == 2) {
+        NSString *countryName = [(NSString *)[contentSegments objectAtIndex:1] substringFromIndex:1];
+        return countryName;
+    } else {
+        NSString *stateName = [(NSString *)[contentSegments objectAtIndex:1] substringFromIndex:1];
+        NSString *countryName = [(NSString *)[contentSegments objectAtIndex:2] substringFromIndex:1];
+        return [NSString stringWithFormat:@"%@,%@", stateName, countryName]; 
+    }
+    
+}
+
++ (NSString *)countryNamePlace:(NSDictionary *)place
+{
+    NSString *content = [place valueForKeyPath:@"_content"];
+    NSArray *contentSegments = [content componentsSeparatedByString:@","];
+    NSInteger numSegments = [contentSegments count];
+    
+    if (numSegments == 0) {
+        return @"";
+    } else if (numSegments == 1) {
+        return content;
+    } else if (numSegments == 2) {
+        NSString *countryName = [(NSString *)[contentSegments objectAtIndex:1] substringFromIndex:1];
+        return countryName;
+    } else {
+        NSString *countryName = [(NSString *)[contentSegments objectAtIndex:2] substringFromIndex:1];
+        return countryName;
+    }
 }
 
 + (NSString *)namePhoto:(NSDictionary *)photo
