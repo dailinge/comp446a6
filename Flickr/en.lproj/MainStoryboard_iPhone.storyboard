@@ -48,18 +48,19 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="WXq-mf-Lyb"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <segue destination="8sK-Zr-C9q" kind="push" identifier="PhotoDetail" id="r0Z-WT-cDo"/>
                     </connections>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="705" y="-835"/>
+            <point key="canvasLocation" x="700" y="-812"/>
         </scene>
         <!--Detail Flickr View Controller-->
         <scene sceneID="DXM-kO-ADa">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="alr-5o-1yA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <tableViewController hidesBottomBarWhenPushed="YES" id="8sK-Zr-C9q" customClass="DetailFlickrViewController" sceneMemberID="viewController">
+                <tableViewController id="8sK-Zr-C9q" customClass="DetailFlickrViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="ym8-az-LK2">
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -102,24 +103,24 @@
                     <navigationItem key="navigationItem" id="9BO-QP-cnR"/>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="1086" y="-835"/>
+            <point key="canvasLocation" x="1117" y="-812"/>
         </scene>
         <!--Photo Flickr View Controller-->
         <scene sceneID="6wm-yO-o5f">
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KqP-JI-Bdn" userLabel="First Responder" sceneMemberID="firstResponder"/>
-                <viewController hidesBottomBarWhenPushed="YES" id="WLd-qL-o88" customClass="PhotoFlickrViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="kvo-jk-UXk">
+                <viewController id="WLd-qL-o88" customClass="PhotoFlickrViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="redraw" id="kvo-jk-UXk">
                         <rect key="frame" x="0.0" y="64" width="320" height="367"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="kzM-tK-GH5">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="AUu-9o-j8D">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="367"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" id="M0C-cd-IwR">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="416"/>
-                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" id="mAn-Ms-8EC">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="367"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
                                 </subviews>
                             </scrollView>
@@ -128,12 +129,12 @@
                     </view>
                     <navigationItem key="navigationItem" id="NF9-J1-DzQ"/>
                     <connections>
-                        <outlet property="imageView" destination="M0C-cd-IwR" id="UAV-uX-K97"/>
-                        <outlet property="scrollView" destination="kzM-tK-GH5" id="B6T-xg-rMj"/>
+                        <outlet property="imageView" destination="mAn-Ms-8EC" id="4gI-gL-QlX"/>
+                        <outlet property="scrollView" destination="AUu-9o-j8D" id="583-k4-mfw"/>
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="1513" y="-843"/>
+            <point key="canvasLocation" x="1553" y="-812"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="X1p-Aj-3fL">

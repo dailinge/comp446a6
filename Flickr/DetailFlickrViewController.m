@@ -101,6 +101,15 @@
 
 #pragma mark - Table view delegate
 
+- (PhotoFlickrViewController *)splitViewPhotoFlickrViewController
+{
+    id pfvc = [self.splitViewController.viewControllers lastObject];
+    if (![pfvc isKindOfClass:[PhotoFlickrViewController class]]) {
+        pfvc = nil;
+    }
+    return pfvc;
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Navigation logic may go here. Create and push another view controller.
@@ -110,7 +119,14 @@
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
-    [self performSegueWithIdentifier:@"PhotoImage" sender:self];
+    if ([self splitViewPhotoFlickrViewController]) {
+        NSDictionary *photo = [self.photoList objectAtIndex:indexPath.row];
+        [self updateFavorite:photo];
+        [[self splitViewPhotoFlickrViewController] setPhoto:photo];
+    } else {
+        [self performSegueWithIdentifier:@"PhotoImage" sender:self];
+    }
+    
 }
 
 
@@ -145,8 +161,8 @@
     [defaults setObject:[newRecents copy] forKey:FLICKR_RECENT];
     
     
-    
 }
+
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {

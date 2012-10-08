@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
+#define degreesToRadians(x) (M_PI * x / 180.0)
 @interface PhotoFlickrViewController : UIViewController
 @property (nonatomic, strong) NSDictionary *photo;
 @end
