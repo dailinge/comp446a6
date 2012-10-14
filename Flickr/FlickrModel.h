@@ -14,5 +14,6 @@
 - (NSInteger)numberOfSection;
 - (NSDictionary *)getPlace:(NSInteger)index sectionNumber:(NSInteger)sectionIndex;
 - (NSString *)getSectionName:(NSInteger)index;
+- (id)initWithEmptyData;
 
 @end

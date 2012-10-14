@@ -26,26 +26,40 @@
 
 
 - (void)loadImage {
-    NSURL *imageUrl = [FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge];
-    NSData *photoData = [NSData dataWithContentsOfURL:imageUrl];
-    self.imageView.image = [UIImage imageWithData:photoData];
-    self.imageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.imageView.image.size};
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] 
+                                        initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinner startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
     
-    self.scrollView.contentSize = self.imageView.image.size;
-    self.scrollView.delegate = self;
+    dispatch_queue_t downloadQueue = dispatch_queue_create("flickr download queue3", NULL);
+    dispatch_async(downloadQueue, ^{
+        NSURL *imageUrl = [FlickrFetcher urlForPhoto:self.photo format:FlickrPhotoFormatLarge];
+        NSData *photoData = [NSData dataWithContentsOfURL:imageUrl];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.imageView.image = [UIImage imageWithData:photoData];
+            self.imageView.frame = (CGRect){.origin=CGPointMake(0.0f, 0.0f), .size=self.imageView.image.size};
+            self.scrollView.contentSize = self.imageView.image.size;
+            CGRect scrollViewBounds = self.scrollView.bounds;
+            CGFloat scaleWidth = scrollViewBounds.size.width / self.imageView.image.size.width;
+            CGFloat scaleHeight = scrollViewBounds.size.height / self.imageView.image.size.height;
+            CGFloat minScale = MIN(scaleWidth, scaleHeight);
+            
+            if (minScale > 1.0f) {
+                self.scrollView.minimumZoomScale = 1.0f;
+                self.scrollView.maximumZoomScale = 2.0f;
+            } else {
+                self.scrollView.minimumZoomScale = minScale;
+                self.scrollView.maximumZoomScale = 1.0f;
+            }
+            [self.scrollView zoomToRect:self.imageView.frame animated:YES];
+            self.navigationItem.rightBarButtonItem = nil;
+        });
+    });
+    dispatch_release(downloadQueue);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    
-    CGRect scrollViewBounds = self.scrollView.bounds;
-    CGFloat scaleWidth = scrollViewBounds.size.width / self.imageView.image.size.width;
-    CGFloat scaleHeight = scrollViewBounds.size.height / self.imageView.image.size.height;
-    CGFloat minScale = MIN(scaleWidth, scaleHeight);
-    
-    self.scrollView.minimumZoomScale = minScale;
-    self.scrollView.maximumZoomScale = 1.0f;
-    [self.scrollView zoomToRect:self.imageView.frame animated:YES];
     
 }
 
@@ -57,20 +71,10 @@
         if (self.splitViewController == nil) {
             self.title = [FlickrFetcher namePhoto:photo];
         } else {
+            self.imageView.image = nil;
             self.scrollView.zoomScale = 1.0f;
+            
             [self loadImage];
-            CGRect scrollViewBounds = self.scrollView.bounds;
-            CGFloat scaleWidth = scrollViewBounds.size.width / self.imageView.image.size.width;
-            CGFloat scaleHeight = scrollViewBounds.size.height / self.imageView.image.size.height;
-            CGFloat minScale = MIN(scaleWidth, scaleHeight);
-            if (minScale > 1.0f) {
-                self.scrollView.minimumZoomScale = 1.0f;
-                self.scrollView.maximumZoomScale = 2.0f;
-            } else {
-                self.scrollView.minimumZoomScale = minScale;
-                self.scrollView.maximumZoomScale = 1.0f;
-            }
-            [self.scrollView zoomToRect:self.imageView.frame animated:YES];
         }
         
     }
@@ -82,6 +86,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     self.splitViewController.delegate = self;
+    self.scrollView.delegate = self;
     [self loadImage];
 }
 

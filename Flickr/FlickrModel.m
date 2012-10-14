@@ -51,6 +51,17 @@
     self.countryDict = newCountryDict;
 }
 
+- (id)initWithEmptyData
+{
+    if (self = [super init])
+    {
+        self.sectionNames = [[NSArray alloc] init];
+        self.flickrInfo = [[NSArray alloc] init];
+        self.countryDict = [[NSDictionary alloc] initWithObjectsAndKeys:nil];
+    }
+    return self;
+}
+
 - (id)init
 {
     if (self = [super init])

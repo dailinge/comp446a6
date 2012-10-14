@@ -93,6 +93,14 @@
     
 }
 
+- (PhotoFlickrViewController *)splitViewPhotoFlickrViewController
+{
+    id pfvc = [self.splitViewController.viewControllers lastObject];
+    if (![pfvc isKindOfClass:[PhotoFlickrViewController class]]) {
+        pfvc = nil;
+    }
+    return pfvc;
+}
 
 #pragma mark - Table view delegate
 
@@ -105,7 +113,14 @@
      // Pass the selected object to the new view controller.
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
-    [self performSegueWithIdentifier:@"RecentPhoto" sender:self];
+    if ([self splitViewPhotoFlickrViewController]) {
+        NSDictionary *photo = [[self getRecents] objectAtIndex:indexPath.row];
+        [self updateFavorite:photo];
+        [[self splitViewPhotoFlickrViewController] setPhoto:photo];
+        [self.tableView reloadData];
+    } else {
+        [self performSegueWithIdentifier:@"RecentPhoto" sender:self];
+    }
 }
 
 - (void)updateFavorite:(NSDictionary *)photo

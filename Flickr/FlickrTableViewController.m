@@ -21,8 +21,33 @@
 @synthesize flickrModel = _flickrModel;
 
 - (FlickrModel *)flickrModel {
-    if (!_flickrModel) _flickrModel = [[FlickrModel alloc] init];
+    if (!_flickrModel) _flickrModel = [[FlickrModel alloc] initWithEmptyData];
     return _flickrModel;
+}
+
+- (void)setFlickrModel:(FlickrModel *)flickrModel {
+    if (_flickrModel != flickrModel) {
+        _flickrModel = flickrModel;
+        if (self.tableView.window) [self.tableView reloadData];
+    }
+}
+
+- (IBAction)refresh:(id)sender {
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] 
+                                        initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinner startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
+    
+    
+    dispatch_queue_t downloadQueue = dispatch_queue_create("flickr download queue1", NULL);
+    dispatch_async(downloadQueue, ^{
+        FlickrModel *flickrModel = [[FlickrModel alloc] init];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.navigationItem.rightBarButtonItem = sender;
+            self.flickrModel = flickrModel;
+        });
+    });
+    dispatch_release(downloadQueue);
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -50,7 +75,8 @@
 - (void) viewWillAppear:(BOOL)animated
 {
     self.navigationItem.title = @"Most Viewed";
-    [self.tableView reloadData];
+    [self refresh:self.navigationItem.rightBarButtonItem];
+   
 }
 
 - (void)viewDidUnload
@@ -105,6 +131,11 @@
 
 #pragma mark - Table view delegate
 
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Navigation logic may go here. Create and push another view controller.
@@ -123,7 +154,7 @@
         NSIndexPath *cellPath = [self.tableView indexPathForSelectedRow];
         NSDictionary *place = [self.flickrModel getPlace:cellPath.row sectionNumber:cellPath.section];
         [segue.destinationViewController setPlace:place];
-        [segue.destinationViewController setPhotoList:[FlickrFetcher photosInPlace:place maxResults:50]];
+        
     }
 }
 

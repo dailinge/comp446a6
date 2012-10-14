@@ -18,22 +18,48 @@
 @synthesize place = _place;
 @synthesize photoList = _photoList;
 
+- (void)reloadPhotoList:(NSDictionary *)place 
+{
+    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] 
+                                        initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinner startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
+    
+    
+    dispatch_queue_t downloadQueue = dispatch_queue_create("flickr download queue2", NULL);
+    dispatch_async(downloadQueue, ^{
+        NSArray *photoList = [FlickrFetcher photosInPlace:place maxResults:50];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.photoList = photoList;
+            self.navigationItem.rightBarButtonItem = nil;
+        });
+    });
+    dispatch_release(downloadQueue);
+}
+
 - (void)setPlace:(NSDictionary *)place
 {
     if (place != _place) {
         _place = place;
-        NSString *content = [_place valueForKeyPath:@"_content"];
-        NSArray *contentSegments = [content componentsSeparatedByString:@","];
-        NSString *cityName = [contentSegments objectAtIndex:0];
-        self.title = cityName;
+        [self reloadPhotoList:place];
+        self.title = [FlickrFetcher namePlace:place];
     }
 }
 
 - (void)setPhotoList:(NSArray *)photoList {
     if (photoList != _photoList) {
-        //NSLog(@"%@", photoList);
         _photoList = photoList;
+        if (self.tableView.window) [self.tableView reloadData];
     }
+}
+
+- (NSArray *)photoList
+{
+    if (!_photoList) {
+        _photoList = [[NSArray alloc] init];
+    }
+    return _photoList;
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -108,6 +134,11 @@
         pfvc = nil;
     }
     return pfvc;
+}
+
+- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
+{
+    
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

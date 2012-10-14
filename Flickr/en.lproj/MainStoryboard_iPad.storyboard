@@ -30,11 +30,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FlickrCell" textLabel="V6q-UA-Rck" detailTextLabel="Naj-KU-2Ic" style="IBUITableViewCellStyleSubtitle" id="N8E-Ru-OTK">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FlickrCell" textLabel="V6q-UA-Rck" detailTextLabel="Naj-KU-2Ic" style="IBUITableViewCellStyleSubtitle" id="N8E-Ru-OTK">
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="V6q-UA-Rck">
@@ -61,7 +61,13 @@
                             <outlet property="delegate" destination="14P-LQ-T3q" id="Ikk-f3-NkO"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="xnR-pN-iRf"/>
+                    <navigationItem key="navigationItem" id="xnR-pN-iRf">
+                        <barButtonItem key="rightBarButtonItem" title="Refresh" id="lAU-Rk-K30">
+                            <connections>
+                                <action selector="refresh:" destination="14P-LQ-T3q" id="qGn-K9-mno"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <segue destination="la4-db-0aT" kind="push" identifier="PhotoDetail" id="HYL-Sb-Lwh"/>
                     </connections>
@@ -79,11 +85,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FlickrPhotoCell" textLabel="7Vq-gB-m1J" detailTextLabel="hRF-GY-7qU" style="IBUITableViewCellStyleSubtitle" id="zks-fc-Xb9">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="detailDisclosureButton" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FlickrPhotoCell" textLabel="7Vq-gB-m1J" detailTextLabel="hRF-GY-7qU" style="IBUITableViewCellStyleSubtitle" id="zks-fc-Xb9">
                                 <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                    <rect key="frame" x="0.0" y="0.0" width="300" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="7Vq-gB-m1J">
