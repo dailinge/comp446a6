@@ -112,7 +112,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="9BO-QP-cnR">
-                        <barButtonItem key="leftBarButtonItem" title="Map" id="YU9-fs-wsf">
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="YU9-fs-wsf">
                             <connections>
                                 <action selector="toggleView:" destination="8sK-Zr-C9q" id="xMF-Km-wNX"/>
                             </connections>
@@ -233,7 +233,13 @@
                         </connections>
                     </tableView>
                     <tabBarItem key="tabBarItem" systemItem="recents" id="nux-3U-gPX"/>
-                    <navigationItem key="navigationItem" id="oE8-dP-l9T"/>
+                    <navigationItem key="navigationItem" id="oE8-dP-l9T">
+                        <barButtonItem key="rightBarButtonItem" title="Map" id="jFQ-77-Vd6">
+                            <connections>
+                                <action selector="toggleView:" destination="WpN-RJ-7aG" id="CYx-zX-Mcu"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="700" y="-58"/>
@@ -264,6 +270,6 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="LFi-JU-Nlo"/>
+        <segue reference="8eI-9r-Bsb"/>
     </inferredMetricsTieBreakers>
 </document>

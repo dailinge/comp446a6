@@ -28,8 +28,8 @@
     UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] 
                                         initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     [spinner startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
-    
+    UIView *rightBarView = self.navigationItem.rightBarButtonItem.customView;
+    self.navigationItem.rightBarButtonItem.customView = spinner;
     
     dispatch_queue_t downloadQueue = dispatch_queue_create("flickr download queue2", NULL);
     dispatch_async(downloadQueue, ^{
@@ -37,7 +37,7 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
             self.photoList = photoList;
-            self.navigationItem.rightBarButtonItem = nil;
+            self.navigationItem.rightBarButtonItem.customView = rightBarView;
         });
     });
     dispatch_release(downloadQueue);
@@ -130,9 +130,9 @@
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
     if ([self.viewMode isEqualToString:@"Map"]) {
-        self.navigationItem.leftBarButtonItem.title = @"List";
+        self.navigationItem.rightBarButtonItem.title = @"List";
     } else if ([self.viewMode isEqualToString:@"List"]) {
-        self.navigationItem.leftBarButtonItem.title = @"Map";
+        self.navigationItem.rightBarButtonItem.title = @"Map";
     }
     
     if (!self.tableViewStub && [self.view isKindOfClass:[UITableView class]]) {
@@ -313,7 +313,15 @@
 
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
-    [self performSegueWithIdentifier:@"PhotoImage" sender:view];
+    if ([self splitViewPhotoFlickrViewController]) {
+        FlickrPhotoAnnotation *annotation = (FlickrPhotoAnnotation *) view.annotation;
+        NSDictionary *photo = annotation.photo;
+        [self updateFavorite:photo];
+        [[self splitViewPhotoFlickrViewController] setPhoto:photo];
+    } else {
+        [self performSegueWithIdentifier:@"PhotoImage" sender:view];
+    }
+    
 }
 
 @end
