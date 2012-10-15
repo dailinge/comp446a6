@@ -10,8 +10,9 @@
 #import "FlickrFetcher.h"
 #import "FlickrModel.h"
 #import "DetailFlickrViewController.h"
+#import "FlickrPlaceAnnotation.h"
 
-@interface FlickrTableViewController ()
+@interface FlickrTableViewController () <MKMapViewDelegate>
 
 @property (nonatomic, strong) FlickrModel *flickrModel;
 @end
@@ -19,6 +20,11 @@
 @implementation FlickrTableViewController
 
 @synthesize flickrModel = _flickrModel;
+@synthesize mapView = _mapView;
+@synthesize tableViewStub = _tableViewStub;
+@synthesize annotations = _annotations;
+@synthesize viewMode = _viewMode;
+
 
 - (FlickrModel *)flickrModel {
     if (!_flickrModel) _flickrModel = [[FlickrModel alloc] initWithEmptyData];
@@ -28,7 +34,52 @@
 - (void)setFlickrModel:(FlickrModel *)flickrModel {
     if (_flickrModel != flickrModel) {
         _flickrModel = flickrModel;
-        if (self.tableView.window) [self.tableView reloadData];
+        if (self.tableViewStub.window) [self.tableViewStub reloadData];
+        NSArray *places = [flickrModel getPlaces];
+        NSMutableDictionary *annotations = [NSMutableDictionary dictionaryWithCapacity:[places count]];
+        for (NSDictionary *place in places) {
+            FlickrPlaceAnnotation *annotation = [FlickrPlaceAnnotation annotationForPlace:place];
+            [self.mapView addAnnotation:annotation];
+            [annotations setValue:annotation forKey:[FlickrFetcher namePlace:place]];
+        }
+        self.annotations = annotations;
+    }
+}
+
+- (MKMapView *)mapView
+{
+    if (!_mapView) {
+        _mapView = [[MKMapView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+        UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Standard", @"Satellite", @"Hybrid", nil]]; // TODO i18n
+        [segmentedControl setFrame:CGRectMake(32, 4, 256, 32)];
+        segmentedControl.selectedSegmentIndex = 0;
+        [segmentedControl addTarget:self action:@selector(changeMapType:) forControlEvents:UIControlEventValueChanged];
+        [_mapView addSubview:segmentedControl];
+    }
+    return _mapView;
+}
+
+- (NSString *)viewMode
+{
+    if (!_viewMode) {
+        _viewMode = @"List";
+    }
+    return _viewMode;
+}
+
+- (IBAction)toggleView:(UIBarButtonItem *)sender
+{
+    self.viewMode = sender.title;
+    if ([sender.title isEqualToString:@"List"]) {
+        self.tableViewStub.hidden = NO;
+        self.view = self.tableViewStub;
+        sender.title = @"Map";
+        self.mapView.hidden = YES;
+    } else if ([sender.title isEqualToString:@"Map"]) {
+        self.mapView.hidden = NO;
+        self.view = self.mapView;
+        sender.title = @"List";
+        self.tableViewStub.hidden = YES;
     }
 }
 
@@ -69,6 +120,28 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    if ([self.viewMode isEqualToString:@"Map"]) {
+        self.navigationItem.leftBarButtonItem.title = @"List";
+    } else if ([self.viewMode isEqualToString:@"List"]) {
+        self.navigationItem.leftBarButtonItem.title = @"Map";
+    }
+    
+    if (!self.tableViewStub && [self.view isKindOfClass:[UITableView class]]) {
+		self.tableViewStub = (UITableView *)self.view;
+	}
+    
+    self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+	
+    self.tableViewStub.frame = self.view.bounds;
+	[self.view addSubview:self.tableViewStub];
+	
+	self.mapView.frame = self.view.bounds;
+    self.mapView.zoomEnabled = YES;
+    self.mapView.scrollEnabled = YES;
+	[self.view addSubview:self.mapView];
+	
+	self.mapView.hidden = YES;
+    self.mapView.delegate = self;
 
 }
 
@@ -131,11 +204,6 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView accessoryButtonTappedForRowWithIndexPath:(NSIndexPath *)indexPath
-{
-    
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // Navigation logic may go here. Create and push another view controller.
@@ -151,11 +219,34 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     if ([segue.identifier isEqualToString:@"PhotoDetail"]) {
-        NSIndexPath *cellPath = [self.tableView indexPathForSelectedRow];
-        NSDictionary *place = [self.flickrModel getPlace:cellPath.row sectionNumber:cellPath.section];
+        NSDictionary *place;
+        if ([sender isKindOfClass:[UITableViewController class]]) {
+            NSIndexPath *cellPath = [self.tableViewStub indexPathForSelectedRow];
+            place = [self.flickrModel getPlace:cellPath.row sectionNumber:cellPath.section];
+        } else if ([sender isKindOfClass:[MKAnnotationView class]]) {
+            FlickrPlaceAnnotation *annotation = (FlickrPlaceAnnotation *) ((MKAnnotationView *) sender).annotation;
+            place = annotation.place;
+        }
+      
         [segue.destinationViewController setPlace:place];
-        
     }
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    MKAnnotationView *aView = [mapView dequeueReusableAnnotationViewWithIdentifier:@"FlickrTVC"];
+    if (!aView) {
+        aView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"FlickrTVC"];
+        aView.canShowCallout = YES;
+        aView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    }
+    aView.annotation = annotation;
+    return aView;
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    [self performSegueWithIdentifier:@"PhotoDetail" sender:view];
 }
 
 

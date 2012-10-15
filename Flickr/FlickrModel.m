@@ -89,6 +89,11 @@
     return [[self.countryDict objectForKey:[self.sectionNames objectAtIndex:sectionIndex]] objectAtIndex:index];
 }
 
+- (NSArray *)getPlaces
+{
+    return self.flickrInfo;
+}
+
 - (NSString *)getSectionName:(NSInteger)index 
 {
     return [self.sectionNames objectAtIndex:index];

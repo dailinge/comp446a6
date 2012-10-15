@@ -9,14 +9,19 @@
 #import "DetailFlickrViewController.h"
 #import "PhotoFlickrViewController.h"
 #import "FlickrFetcher.h"
+#import "FlickrPhotoAnnotation.h"
 
-@interface DetailFlickrViewController ()
+@interface DetailFlickrViewController () <MKMapViewDelegate>
 
 @end
 
 @implementation DetailFlickrViewController
 @synthesize place = _place;
 @synthesize photoList = _photoList;
+@synthesize mapView = _mapView;
+@synthesize tableViewStub = _tableViewStub;
+@synthesize annotations = _annotations;
+@synthesize viewMode = _viewMode;
 
 - (void)reloadPhotoList:(NSDictionary *)place 
 {
@@ -50,7 +55,14 @@
 - (void)setPhotoList:(NSArray *)photoList {
     if (photoList != _photoList) {
         _photoList = photoList;
-        if (self.tableView.window) [self.tableView reloadData];
+        if (self.tableViewStub.window) [self.tableViewStub reloadData];
+        NSMutableDictionary *annotations = [NSMutableDictionary dictionaryWithCapacity:[photoList count]];
+        for (NSDictionary *photo in photoList) {
+            FlickrPhotoAnnotation *annotation = [FlickrPhotoAnnotation annotationForPhoto:photo];
+            [self.mapView addAnnotation:annotation];
+            [annotations setValue:annotation forKey:[photo valueForKey:FLICKR_PHOTO_ID]];
+        }
+        self.annotations = annotations;
     }
 }
 
@@ -60,6 +72,43 @@
         _photoList = [[NSArray alloc] init];
     }
     return _photoList;
+}
+
+- (MKMapView *)mapView
+{
+    if (!_mapView) {
+        _mapView = [[MKMapView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+        UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Standard", @"Satellite", @"Hybrid", nil]]; // TODO i18n
+        [segmentedControl setFrame:CGRectMake(32, 4, 256, 32)];
+        segmentedControl.selectedSegmentIndex = 0;
+        [segmentedControl addTarget:self action:@selector(changeMapType:) forControlEvents:UIControlEventValueChanged];
+        [_mapView addSubview:segmentedControl];
+    }
+    return _mapView;
+}
+
+- (NSString *)viewMode
+{
+    if (!_viewMode) {
+        _viewMode = @"List";
+    }
+    return _viewMode;
+}
+
+- (IBAction)toggleView:(UIBarButtonItem *)sender
+{
+    self.viewMode = sender.title;
+    if ([sender.title isEqualToString:@"List"]) {
+        self.tableViewStub.hidden = NO;
+        self.view = self.tableViewStub;
+        sender.title = @"Map";
+        self.mapView.hidden = YES;
+    } else if ([sender.title isEqualToString:@"Map"]) {
+        self.mapView.hidden = NO;
+        self.view = self.mapView;
+        sender.title = @"List";
+        self.tableViewStub.hidden = YES;
+    }
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -80,6 +129,28 @@
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    if ([self.viewMode isEqualToString:@"Map"]) {
+        self.navigationItem.leftBarButtonItem.title = @"List";
+    } else if ([self.viewMode isEqualToString:@"List"]) {
+        self.navigationItem.leftBarButtonItem.title = @"Map";
+    }
+    
+    if (!self.tableViewStub && [self.view isKindOfClass:[UITableView class]]) {
+		self.tableViewStub = (UITableView *)self.view;
+	}
+    
+    self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+	
+    self.tableViewStub.frame = self.view.bounds;
+	[self.view addSubview:self.tableViewStub];
+	
+	self.mapView.frame = self.view.bounds;
+    self.mapView.zoomEnabled = YES;
+    self.mapView.scrollEnabled = YES;
+	[self.view addSubview:self.mapView];
+	
+	self.mapView.hidden = YES;
+    self.mapView.delegate = self;
 }
 
 - (void)viewDidUnload
@@ -122,7 +193,7 @@
 
 - (void) viewWillAppear:(BOOL)animated
 {
-    [self.tableView reloadData];
+    [self.tableViewStub reloadData];
 }
 
 #pragma mark - Table view delegate
@@ -191,18 +262,58 @@
     
     [defaults setObject:[newRecents copy] forKey:FLICKR_RECENT];
     
-    
 }
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     if ([segue.identifier isEqualToString:@"PhotoImage"]) {
-        NSIndexPath *cellPath = [self.tableView indexPathForSelectedRow];
-        NSDictionary *photo = [self.photoList objectAtIndex:cellPath.row];
+        NSDictionary *photo;
+        if ([sender isKindOfClass:[UITableViewController class]]) {
+            NSIndexPath *cellPath = [self.tableViewStub indexPathForSelectedRow];
+            photo = [self.photoList objectAtIndex:cellPath.row];
+        } else if ([sender isKindOfClass:[MKAnnotationView class]]) {
+            FlickrPhotoAnnotation *annotation = (FlickrPhotoAnnotation *) ((MKAnnotationView *) sender).annotation;
+            photo = annotation.photo;
+        }
+        
         [self updateFavorite:photo];
         [segue.destinationViewController setPhoto:photo];
     }
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation
+{
+    MKAnnotationView *aView = [mapView dequeueReusableAnnotationViewWithIdentifier:@"FlickrDVC"];
+    if (!aView) {
+        aView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"FlickrDVC"];
+        aView.canShowCallout = YES;
+        aView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+        aView.leftCalloutAccessoryView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+    }
+    aView.annotation = annotation;
+    [(UIImageView *)aView.leftCalloutAccessoryView setImage:nil];
+    return aView;
+}
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)aView
+{
+    FlickrPhotoAnnotation *annotation = (FlickrPhotoAnnotation *) aView.annotation;
+    dispatch_queue_t downloadQueue = dispatch_queue_create("detail flickr map downloader", NULL);
+    dispatch_async(downloadQueue, ^{
+        NSURL *url = [FlickrFetcher urlForPhoto:annotation.photo format:FlickrPhotoFormatSquare];
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIImage *image = data ? [UIImage imageWithData:data] : nil;
+            ((UIImageView *) aView.leftCalloutAccessoryView).image = image;
+        });
+    });
+    dispatch_release(downloadQueue);
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    [self performSegueWithIdentifier:@"PhotoImage" sender:view];
 }
 
 @end

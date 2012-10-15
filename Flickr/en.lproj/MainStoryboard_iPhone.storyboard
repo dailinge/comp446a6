@@ -48,6 +48,11 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="WXq-mf-Lyb">
+                        <barButtonItem key="leftBarButtonItem" title="Map" id="Vgf-ZW-caQ">
+                            <connections>
+                                <action selector="toggleView:" destination="puI-mi-879" id="Z3h-df-WEE"/>
+                            </connections>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="Refresh" id="zhs-Hy-dMh">
                             <connections>
                                 <action selector="refresh:" destination="puI-mi-879" id="CKQ-ou-yoA"/>
@@ -106,7 +111,13 @@
                             <outlet property="delegate" destination="8sK-Zr-C9q" id="Pgv-Ma-Vro"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="9BO-QP-cnR"/>
+                    <navigationItem key="navigationItem" id="9BO-QP-cnR">
+                        <barButtonItem key="leftBarButtonItem" title="Map" id="YU9-fs-wsf">
+                            <connections>
+                                <action selector="toggleView:" destination="8sK-Zr-C9q" id="xMF-Km-wNX"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
             </objects>
             <point key="canvasLocation" x="1117" y="-812"/>
@@ -140,7 +151,7 @@
                     </connections>
                 </viewController>
             </objects>
-            <point key="canvasLocation" x="1553" y="-812"/>
+            <point key="canvasLocation" x="2505" y="-824"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="X1p-Aj-3fL">
@@ -225,7 +236,7 @@
                     <navigationItem key="navigationItem" id="oE8-dP-l9T"/>
                 </tableViewController>
             </objects>
-            <point key="canvasLocation" x="826" y="-58"/>
+            <point key="canvasLocation" x="700" y="-58"/>
         </scene>
     </scenes>
     <classes>
