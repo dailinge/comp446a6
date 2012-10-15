@@ -2,7 +2,7 @@
 //  FlickrPlaceAnnotation.m
 //  Flickr
 //
-//  Created by Heaven  Chen on 10/14/12.
+//  Created by Linge Dai on 10/14/12.
 //  Copyright (c) 2012 Rice. All rights reserved.
 //
 
@@ -23,6 +23,8 @@
     annotation.provinceAndCountry = [FlickrFetcher descriptionPlace:place];
     return annotation;
 }
+
+#pragma mark - MKAnnotation
 
 - (NSString *)title
 {

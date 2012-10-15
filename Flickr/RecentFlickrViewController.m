@@ -27,7 +27,7 @@
     if (!_mapView) {
         _mapView = [[MKMapView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
         UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Standard", @"Satellite", @"Hybrid", nil]]; 
-        [segmentedControl setFrame:CGRectMake(32, 4, 256, 32)];
+        [segmentedControl setFrame:CGRectMake(32, 4, 256, 40)];
         segmentedControl.selectedSegmentIndex = 0;
         [segmentedControl addTarget:self action:@selector(changeMapType:) forControlEvents:UIControlEventValueChanged];
         [_mapView addSubview:segmentedControl];
@@ -111,6 +111,10 @@
         [annotations setValue:annotation forKey:[photo valueForKey:FLICKR_PHOTO_ID]];
     }
     self.annotations = annotations;
+    CLLocationCoordinate2D coordinate;
+    coordinate.latitude = 0.0;
+    coordinate.longitude = 0.0;
+    self.mapView.region = MKCoordinateRegionMake(coordinate, MKCoordinateSpanMake(180, 180));
 }
 
 - (void) viewWillAppear:(BOOL)animated
@@ -170,15 +174,33 @@
     
     cell.detailTextLabel.text = [FlickrFetcher descriptionPhoto:photo];   
     
+    dispatch_queue_t downloadQueue = dispatch_queue_create("flickr recent thumbnail downloader", NULL);
+    dispatch_async(downloadQueue, ^{
+        NSURL *url = [FlickrFetcher urlForPhoto:photo format:FlickrPhotoFormatSquare];
+        NSData *data = [NSData dataWithContentsOfURL:url];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ([cell.textLabel.text isEqualToString:[FlickrFetcher namePhoto:photo]] && [cell.detailTextLabel.text isEqualToString:[FlickrFetcher descriptionPhoto:photo]]) {
+                UIImage *image = data ? [UIImage imageWithData:data] : nil;
+                cell.imageView.image = image;
+                cell.imageView.hidden = NO;
+                [cell setNeedsLayout];
+            }
+        });
+    });
     return cell;
     
 }
 
 - (PhotoFlickrViewController *)splitViewPhotoFlickrViewController
 {
-    id pfvc = [self.splitViewController.viewControllers lastObject];
+    id nvc = [self.splitViewController.viewControllers lastObject];
+    if (![nvc isKindOfClass:[UINavigationController class]]) {
+        return nil;
+    }
+    NSArray *viewControllers = [(UINavigationController *)nvc viewControllers];
+    id pfvc = [viewControllers objectAtIndex:0];
     if (![pfvc isKindOfClass:[PhotoFlickrViewController class]]) {
-        pfvc = nil;
+        return nil;
     }
     return pfvc;
 }
@@ -294,6 +316,24 @@
         [[self splitViewPhotoFlickrViewController] setPhoto:photo];
     } else {
         [self performSegueWithIdentifier:@"RecentPhoto" sender:view];
+    }
+}
+
+- (IBAction)changeMapType:(UISegmentedControl *)sender
+{
+    switch (sender.selectedSegmentIndex) {
+        case 0:
+            self.mapView.mapType = MKMapTypeStandard;
+            break;
+        case 1:
+            self.mapView.mapType = MKMapTypeSatellite;
+            break;
+        case 2:
+            self.mapView.mapType = MKMapTypeHybrid;
+            break;
+        default:
+            self.mapView.mapType = MKMapTypeStandard;
+            break;
     }
 }
 

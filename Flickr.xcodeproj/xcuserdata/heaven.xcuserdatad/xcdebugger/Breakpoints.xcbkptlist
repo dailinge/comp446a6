@@ -8,11 +8,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Flickr/DetailFlickrViewController.m"
-         timestampString = "371968683.737828"
+         timestampString = "371977194.605691"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "218"
-         endingLineNumber = "218"
+         startingLineNumber = "240"
+         endingLineNumber = "240"
          landmarkName = "-tableView:didSelectRowAtIndexPath:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -123,11 +123,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Flickr/RecentFlickrViewController.m"
-         timestampString = "371969846.175498"
+         timestampString = "371975721.844649"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "119"
-         endingLineNumber = "119"
+         startingLineNumber = "123"
+         endingLineNumber = "123"
          landmarkName = "-viewWillAppear:"
          landmarkType = "5">
       </FileBreakpoint>

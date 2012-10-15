@@ -51,7 +51,7 @@
     if (!_mapView) {
         _mapView = [[MKMapView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
         UISegmentedControl *segmentedControl = [[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Standard", @"Satellite", @"Hybrid", nil]]; // TODO i18n
-        [segmentedControl setFrame:CGRectMake(32, 4, 256, 32)];
+        [segmentedControl setFrame:CGRectMake(32, 4, 256, 40)];
         segmentedControl.selectedSegmentIndex = 0;
         [segmentedControl addTarget:self action:@selector(changeMapType:) forControlEvents:UIControlEventValueChanged];
         [_mapView addSubview:segmentedControl];
@@ -99,6 +99,10 @@
         });
     });
     dispatch_release(downloadQueue);
+    CLLocationCoordinate2D coordinate;
+    coordinate.latitude = 0.0;
+    coordinate.longitude = 0.0;
+    self.mapView.region = MKCoordinateRegionMake(coordinate, MKCoordinateSpanMake(180, 180));
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -247,6 +251,24 @@
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
     [self performSegueWithIdentifier:@"PhotoDetail" sender:view];
+}
+
+- (IBAction)changeMapType:(UISegmentedControl *)sender
+{
+    switch (sender.selectedSegmentIndex) {
+        case 0:
+            self.mapView.mapType = MKMapTypeStandard;
+            break;
+        case 1:
+            self.mapView.mapType = MKMapTypeSatellite;
+            break;
+        case 2:
+            self.mapView.mapType = MKMapTypeHybrid;
+            break;
+        default:
+            self.mapView.mapType = MKMapTypeStandard;
+            break;
+    }
 }
 
 

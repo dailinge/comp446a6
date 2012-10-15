@@ -73,7 +73,7 @@
         } else {
             self.imageView.image = nil;
             self.scrollView.zoomScale = 1.0f;
-            
+            self.title = [FlickrFetcher namePhoto:photo];
             [self loadImage];
         }
         
