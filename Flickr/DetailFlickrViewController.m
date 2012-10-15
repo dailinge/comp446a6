@@ -204,7 +204,7 @@
             }
         });
     });
-    
+    dispatch_release(downloadQueue);
     return cell;
 }
 
