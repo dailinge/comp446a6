@@ -81,6 +81,11 @@
         
 }
 
+- (void)awakeFromNib{
+    [super awakeFromNib];
+    self.splitViewController.delegate = self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -135,10 +140,7 @@
 - (void)setSplitViewBarButtonItem:(UIBarButtonItem *)splitViewBarButtonItem
 {
     if (_splitViewBarButtonItem != splitViewBarButtonItem) {
-        NSMutableArray *toolbarItems = [self.toolBar.items mutableCopy];
-        if (_splitViewBarButtonItem) [toolbarItems removeObject:_splitViewBarButtonItem];
-        if (splitViewBarButtonItem) [toolbarItems insertObject:splitViewBarButtonItem atIndex:0];
-        self.toolBar.items = toolbarItems;
+        self.navigationItem.leftBarButtonItem = splitViewBarButtonItem;
         _splitViewBarButtonItem = splitViewBarButtonItem;
     }
 }
