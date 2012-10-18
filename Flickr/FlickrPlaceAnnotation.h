@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
+#import "Place.h"
 
 @interface FlickrPlaceAnnotation : NSObject <MKAnnotation>
-+ (FlickrPlaceAnnotation *)annotationForPlace:(NSDictionary *)place;
++ (FlickrPlaceAnnotation *)annotationForPlace:(Place *)place;
 
-@property (nonatomic, strong) NSDictionary *place;
 @property (strong, nonatomic) NSString *city;
 @property (strong, nonatomic) NSString *provinceAndCountry;
+@property (strong, nonatomic) NSString *latitude;
+@property (strong, nonatomic) NSString *longitude;
 
 @end

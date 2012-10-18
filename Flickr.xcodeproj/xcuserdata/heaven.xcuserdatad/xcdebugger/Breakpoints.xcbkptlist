@@ -32,11 +32,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Flickr/PhotoFlickrViewController.m"
-         timestampString = "371366679.828688"
+         timestampString = "372199080.824685"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "22"
-         endingLineNumber = "22"
+         startingLineNumber = "23"
+         endingLineNumber = "23"
          landmarkName = "scrollView"
          landmarkType = "19">
       </FileBreakpoint>
@@ -45,11 +45,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Flickr/PhotoFlickrViewController.m"
-         timestampString = "372134228.883544"
+         timestampString = "372200045.089125"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "100"
-         endingLineNumber = "100"
+         startingLineNumber = "87"
+         endingLineNumber = "87"
          landmarkName = "-viewDidUnload"
          landmarkType = "5">
       </FileBreakpoint>
@@ -64,6 +64,32 @@
          startingLineNumber = "123"
          endingLineNumber = "123"
          landmarkName = "-viewWillAppear:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Flickr/Place+Flickr.m"
+         timestampString = "372219212.707991"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "21"
+         endingLineNumber = "21"
+         landmarkName = "+placeWithPlaceInfo:inManagedObjectContext:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Flickr/FlickrTableViewController.m"
+         timestampString = "372221041.234858"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "48"
+         endingLineNumber = "48"
+         landmarkName = "-fetchFlickrDataIntoDocument:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>

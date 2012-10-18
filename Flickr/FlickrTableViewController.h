@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
+#import "CoreDataTableViewController.h"
 
-@interface FlickrTableViewController : UITableViewController
+@interface FlickrTableViewController : CoreDataTableViewController
 @property (nonatomic, strong) MKMapView *mapView;
 @property (nonatomic, strong) UITableView *tableViewStub;
 @property (nonatomic, strong) NSDictionary *annotations;
 @property (nonatomic, strong) NSString *viewMode;
+@property (nonatomic, strong) UIManagedDocument *placeDatabase;
 @end

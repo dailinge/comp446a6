@@ -133,11 +133,11 @@
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="AUu-9o-j8D">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="367"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" id="mAn-Ms-8EC">
                                         <rect key="frame" x="0.0" y="0.0" width="320" height="367"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     </imageView>
                                 </subviews>
                             </scrollView>
@@ -246,10 +246,13 @@
         </scene>
     </scenes>
     <classes>
+        <class className="CoreDataTableViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CoreDataTableViewController.h"/>
+        </class>
         <class className="DetailFlickrViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/DetailFlickrViewController.h"/>
         </class>
-        <class className="FlickrTableViewController" superclassName="UITableViewController">
+        <class className="FlickrTableViewController" superclassName="CoreDataTableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/FlickrTableViewController.h"/>
         </class>
         <class className="PhotoFlickrViewController" superclassName="UIViewController">
@@ -257,6 +260,7 @@
             <relationships>
                 <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="spinner" candidateClass="UIActivityIndicatorView"/>
                 <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
             </relationships>
         </class>

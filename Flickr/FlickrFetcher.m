@@ -8,7 +8,7 @@
 #import "FlickrFetcher.h"
 #import "FlickrAPIKey.h"
 
-#define FLICKR_PLACE_ID @"place_id"
+
 
 @implementation FlickrFetcher
 
@@ -16,12 +16,12 @@
 {
     query = [NSString stringWithFormat:@"%@&format=json&nojsoncallback=1&api_key=%@", query, FlickrAPIKey];
     query = [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    // NSLog(@"[%@ %@] sent %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), query);
+    NSLog(@"[%@ %@] sent %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), query);
     NSData *jsonData = [[NSString stringWithContentsOfURL:[NSURL URLWithString:query] encoding:NSUTF8StringEncoding error:nil] dataUsingEncoding:NSUTF8StringEncoding];
     NSError *error = nil;
     NSDictionary *results = jsonData ? [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&error] : nil;
     if (error) NSLog(@"[%@ %@] JSON error: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), error.localizedDescription);
-    // NSLog(@"[%@ %@] received %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), results);
+    NSLog(@"[%@ %@] received %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), results);
     return results;
 }
 
@@ -79,7 +79,8 @@
     return [NSURL URLWithString:[self urlStringForPhoto:photo format:format]];
 }
 
-+ (NSString *)namePlace:(NSDictionary *)place {
++ (NSString *)namePlace:(NSDictionary *)place 
+{
     NSString *content = [place valueForKeyPath:@"_content"];
     NSArray *contentSegments = [content componentsSeparatedByString:@","];
     NSString *cityName = [contentSegments objectAtIndex:0];

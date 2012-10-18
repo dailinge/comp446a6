@@ -11,6 +11,9 @@
 #import "FlickrModel.h"
 #import "DetailFlickrViewController.h"
 #import "FlickrPlaceAnnotation.h"
+#import "Place.h"
+#import "Place+Flickr.h"
+
 
 @interface FlickrTableViewController () <MKMapViewDelegate>
 
@@ -24,27 +27,61 @@
 @synthesize tableViewStub = _tableViewStub;
 @synthesize annotations = _annotations;
 @synthesize viewMode = _viewMode;
+@synthesize placeDatabase = _placeDatabase;
 
-
-- (FlickrModel *)flickrModel {
-    if (!_flickrModel) _flickrModel = [[FlickrModel alloc] initWithEmptyData];
-    return _flickrModel;
+- (void)setupFetchedResultsController
+{
+    NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"Place"];
+    
+    request.sortDescriptors = [NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"country" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)], nil];
+    
+    self.fetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:self.placeDatabase.managedObjectContext sectionNameKeyPath:@"country" cacheName:nil];
 }
 
-- (void)setFlickrModel:(FlickrModel *)flickrModel {
-    if (_flickrModel != flickrModel) {
-        _flickrModel = flickrModel;
-        if (self.tableViewStub.window) [self.tableViewStub reloadData];
-        NSArray *places = [flickrModel getPlaces];
-        NSMutableDictionary *annotations = [NSMutableDictionary dictionaryWithCapacity:[places count]];
-        for (NSDictionary *place in places) {
-            FlickrPlaceAnnotation *annotation = [FlickrPlaceAnnotation annotationForPlace:place];
-            [self.mapView addAnnotation:annotation];
-            [annotations setValue:annotation forKey:[FlickrFetcher namePlace:place]];
-        }
-        self.annotations = annotations;
+- (void)fetchFlickrDataIntoDocument:(UIManagedDocument *)document
+{
+    dispatch_queue_t fetchQ = dispatch_queue_create("Flickr fetch", NULL);
+    
+    dispatch_async(fetchQ, ^{
+        NSArray *places = [FlickrFetcher topPlaces];
+        [document.managedObjectContext performBlock:^{
+            for (NSDictionary *place in places) {
+                // start creating objects in document's context
+                
+                [Place placeWithPlaceInfo:place inManagedObjectContext:document.managedObjectContext];
+            }
+            [document saveToURL:document.fileURL forSaveOperation:UIDocumentSaveForOverwriting completionHandler:NULL];
+        }];
+    });
+    dispatch_release(fetchQ);
+}
+
+- (void)useDocument
+{
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[self.placeDatabase.fileURL path]]) {
+        [self.placeDatabase saveToURL:self.placeDatabase.fileURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
+            [self setupFetchedResultsController];
+            [self fetchFlickrDataIntoDocument:self.placeDatabase];
+            
+        }];
+    } else if (self.placeDatabase.documentState == UIDocumentStateClosed) {
+        [self.placeDatabase openWithCompletionHandler:^(BOOL success) {
+            [self setupFetchedResultsController];
+            
+        }];
+    } else if (self.placeDatabase.documentState == UIDocumentStateNormal) {
+        [self setupFetchedResultsController];
     }
 }
+
+- (void)setPlaceDatabase:(UIManagedDocument *)placeDatabase
+{
+    if (_placeDatabase != placeDatabase) {
+        _placeDatabase = placeDatabase;
+        [self useDocument];
+    }
+}
+
 
 - (MKMapView *)mapView
 {
@@ -81,28 +118,6 @@
         sender.title = @"List";
         self.tableViewStub.hidden = YES;
     }
-}
-
-- (IBAction)refresh:(id)sender {
-    UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] 
-                                        initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [spinner startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinner];
-    
-    
-    dispatch_queue_t downloadQueue = dispatch_queue_create("flickr download queue1", NULL);
-    dispatch_async(downloadQueue, ^{
-        FlickrModel *flickrModel = [[FlickrModel alloc] init];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.navigationItem.rightBarButtonItem = sender;
-            self.flickrModel = flickrModel;
-        });
-    });
-    dispatch_release(downloadQueue);
-    CLLocationCoordinate2D coordinate;
-    coordinate.latitude = 0.0;
-    coordinate.longitude = 0.0;
-    self.mapView.region = MKCoordinateRegionMake(coordinate, MKCoordinateSpanMake(180, 180));
 }
 
 - (id)initWithStyle:(UITableViewStyle)style
@@ -146,13 +161,23 @@
 	
 	self.mapView.hidden = YES;
     self.mapView.delegate = self;
+    self.tableView = self.tableViewStub;
 
 }
 
 - (void) viewWillAppear:(BOOL)animated
 {
     self.navigationItem.title = @"Most Viewed";
-    [self refresh:self.navigationItem.rightBarButtonItem];
+    
+    if (!self.placeDatabase) {
+        NSURL *url = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+        url = [url URLByAppendingPathComponent:@"Default Place Database"];
+        self.placeDatabase = [[UIManagedDocument alloc] initWithFileURL:url];
+    }
+    CLLocationCoordinate2D coordinate;
+    coordinate.latitude = 0.0;
+    coordinate.longitude = 0.0;
+    self.mapView.region = MKCoordinateRegionMake(coordinate, MKCoordinateSpanMake(180, 180));
    
 }
 
@@ -171,23 +196,6 @@
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    
-    // Return the number of sections.
-    return [self.flickrModel numberOfSection];
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    // Return the number of rows in the section.
-    return [self.flickrModel numberOfRow:section];
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    return [self.flickrModel getSectionName:section];
-}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -199,9 +207,11 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
     
-    NSDictionary *place = [self.flickrModel getPlace:indexPath.row sectionNumber:indexPath.section];
-    cell.textLabel.text = [FlickrFetcher namePlace:place];
-    cell.detailTextLabel.text = [FlickrFetcher descriptionPlace:place];
+    Place *place = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    cell.textLabel.text = place.city;
+    cell.detailTextLabel.text = place.content;
+    FlickrPlaceAnnotation *annotation = [FlickrPlaceAnnotation annotationForPlace:place];
+    [self.mapView addAnnotation:annotation];
     return cell;
 }
 
@@ -229,7 +239,6 @@
             place = [self.flickrModel getPlace:cellPath.row sectionNumber:cellPath.section];
         } else if ([sender isKindOfClass:[MKAnnotationView class]]) {
             FlickrPlaceAnnotation *annotation = (FlickrPlaceAnnotation *) ((MKAnnotationView *) sender).annotation;
-            place = annotation.place;
         }
       
         [segue.destinationViewController setPlace:place];

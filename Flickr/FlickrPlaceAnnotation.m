@@ -10,17 +10,19 @@
 #import "FlickrFetcher.h"
 
 @implementation FlickrPlaceAnnotation
-@synthesize place = _place;
 @synthesize city = _city;
 @synthesize provinceAndCountry = _provinceAndCountry;
+@synthesize latitude = _latitude;
+@synthesize longitude = _longitude;
 
-+ (FlickrPlaceAnnotation *)annotationForPlace:(NSDictionary *)place
++ (FlickrPlaceAnnotation *)annotationForPlace:(Place *)place
 {
     FlickrPlaceAnnotation *annotation = [[FlickrPlaceAnnotation alloc] init];
-    annotation.place = place;
     
-    annotation.city = [FlickrFetcher namePlace:place];
-    annotation.provinceAndCountry = [FlickrFetcher descriptionPlace:place];
+    annotation.city = place.city;
+    annotation.provinceAndCountry = place.content;
+    annotation.latitude = place.latitude;
+    annotation.longitude = place.longitude;
     return annotation;
 }
 
@@ -39,8 +41,8 @@
 - (CLLocationCoordinate2D)coordinate
 {
     CLLocationCoordinate2D coordinate;
-    coordinate.latitude = [[self.place objectForKey:FLICKR_LATITUDE] doubleValue];
-    coordinate.longitude = [[self.place objectForKey:FLICKR_LONGITUDE] doubleValue];
+    coordinate.latitude = [self.latitude doubleValue];
+    coordinate.longitude = [self.longitude doubleValue];
     return coordinate;
 }
 

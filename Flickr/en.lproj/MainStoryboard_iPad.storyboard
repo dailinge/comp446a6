@@ -211,28 +211,34 @@
             <objects>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="a7N-El-EKy" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController id="22p-c8-Eyo" customClass="PhotoFlickrViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="ZLU-N2-xaM">
+                    <view key="view" contentMode="scaleToFill" id="Zqv-U8-6mS">
                         <rect key="frame" x="0.0" y="64" width="768" height="960"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" id="QQk-mH-g0H">
-                                <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.20000000000000001" maximumZoomScale="5" id="bW8-8d-nJv">
+                                <rect key="frame" x="0.0" y="0.0" width="768" height="916"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" id="M5C-gj-Fto">
-                                        <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" id="JVV-le-7q4">
+                                        <rect key="frame" x="0.0" y="0.0" width="768" height="916"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     </imageView>
                                 </subviews>
                             </scrollView>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" hidesWhenStopped="YES" style="gray" id="qgE-PD-C1Z">
+                                <rect key="frame" x="374" y="470" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <navigationItem key="navigationItem" id="zx6-wA-N4d"/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="blackTranslucent"/>
                     <connections>
-                        <outlet property="imageView" destination="M5C-gj-Fto" id="tCA-8i-9ad"/>
-                        <outlet property="scrollView" destination="QQk-mH-g0H" id="iES-RQ-4qq"/>
+                        <outlet property="imageView" destination="JVV-le-7q4" id="lwn-Ay-BxL"/>
+                        <outlet property="scrollView" destination="bW8-8d-nJv" id="Wli-S5-kUe"/>
+                        <outlet property="spinner" destination="qgE-PD-C1Z" id="9n0-FF-IhU"/>
+                        <outlet property="view" destination="Zqv-U8-6mS" id="1Ao-H4-mHJ"/>
                     </connections>
                 </viewController>
             </objects>
@@ -277,10 +283,13 @@
         </scene>
     </scenes>
     <classes>
+        <class className="CoreDataTableViewController" superclassName="UITableViewController">
+            <source key="sourceIdentifier" type="project" relativePath="./Classes/CoreDataTableViewController.h"/>
+        </class>
         <class className="DetailFlickrViewController" superclassName="UITableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/DetailFlickrViewController.h"/>
         </class>
-        <class className="FlickrTableViewController" superclassName="UITableViewController">
+        <class className="FlickrTableViewController" superclassName="CoreDataTableViewController">
             <source key="sourceIdentifier" type="project" relativePath="./Classes/FlickrTableViewController.h"/>
         </class>
         <class className="PhotoFlickrViewController" superclassName="UIViewController">
@@ -288,6 +297,7 @@
             <relationships>
                 <relationship kind="outlet" name="imageView" candidateClass="UIImageView"/>
                 <relationship kind="outlet" name="scrollView" candidateClass="UIScrollView"/>
+                <relationship kind="outlet" name="spinner" candidateClass="UIActivityIndicatorView"/>
                 <relationship kind="outlet" name="toolBar" candidateClass="UIToolbar"/>
             </relationships>
         </class>
